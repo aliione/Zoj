@@ -1,0 +1,6 @@
+{
+  "name": "بازی زوجین",
+  "description": "اپلیکیشن چالش و بازی دو نفره زوجین با گردونه شانس، حالت سرعت و کارتهای تصادفی",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
