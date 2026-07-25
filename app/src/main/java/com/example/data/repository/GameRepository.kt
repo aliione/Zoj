@@ -44,7 +44,7 @@ class GameRepository(private val context: Context) {
           timerSeconds = obj.optInt("timerSeconds", 45),
           isCustom = false,
           isFavorite = false,
-          imageUri = obj.optString("imageUri", null),
+          imageUri = if (obj.has("imageUri") && !obj.isNull("imageUri")) obj.getString("imageUri") else null,
           isPlayed = false
         )
       )

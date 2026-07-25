@@ -23,26 +23,6 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
-  signingConfigs {
-    getByName("debug") {
-      storeFile = file("${rootDir}/debug.keystore")
-      storePassword = "android"
-      keyAlias = "androiddebugkey"
-      keyPassword = "android"
-      enableV1Signing = true
-      enableV2Signing = true
-    }
-    create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
-      storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = "upload"
-      keyPassword = System.getenv("KEY_PASSWORD")
-      isV1SigningEnabled = true
-      isV2SigningEnabled = true
-    }
-  }
-
   buildTypes {
     release {
       isCrunchPngs = false
@@ -50,7 +30,9 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("debug")
     }
-    debug { signingConfig = signingConfigs.getByName("debug") }
+    debug {
+      signingConfig = signingConfigs.getByName("debug")
+    }
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -97,8 +79,14 @@ tasks.register<CopyApkTask>("copyReleaseApk") {
   targetApk.set(rootProject.layout.projectDirectory.file("app-release.apk"))
 }
 
+tasks.register<CopyApkTask>("copyZojApk") {
+  dependsOn("assembleDebug")
+  sourceApk.set(layout.buildDirectory.file("outputs/apk/debug/app-debug.apk"))
+  targetApk.set(rootProject.layout.projectDirectory.file("zoj.apk"))
+}
+
 tasks.register("copyApk") {
-  dependsOn("copyDebugApk", "copyReleaseApk")
+  dependsOn("copyDebugApk", "copyReleaseApk", "copyZojApk")
 }
 
 
