@@ -433,7 +433,7 @@ fun CardFormDialog(
             input.copyTo(output)
           }
         }
-        imageUri = imageFile.toURI().toString()
+        imageUri = imageFile.absolutePath
       } catch (e: Exception) {
         imageUri = inputUri.toString()
       }

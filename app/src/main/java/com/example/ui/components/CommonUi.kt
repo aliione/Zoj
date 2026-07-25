@@ -33,6 +33,14 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import java.io.File
+import android.net.Uri
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -194,6 +202,9 @@ fun CardDisplayImage(
   modifier: Modifier = Modifier,
   shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(20.dp)
 ) {
+  val context = LocalContext.current
+  var isError by remember(imageUri) { mutableStateOf(false) }
+
   Box(
     modifier = modifier
       .clip(shape)
@@ -208,12 +219,27 @@ fun CardDisplayImage(
       .border(2.5.dp, ArtisticGold.copy(alpha = 0.85f), shape),
     contentAlignment = Alignment.Center
   ) {
-    if (!imageUri.isNullOrBlank() && (imageUri.startsWith("content://") || imageUri.startsWith("file://") || imageUri.startsWith("http"))) {
+    if (!imageUri.isNullOrBlank() && !isError) {
+      val modelData: Any = remember(imageUri) {
+        when {
+          imageUri.startsWith("/") -> File(imageUri)
+          imageUri.startsWith("file:") -> Uri.parse(imageUri)
+          imageUri.startsWith("content:") -> Uri.parse(imageUri)
+          else -> imageUri
+        }
+      }
+      val imageRequest = remember(modelData, context) {
+        ImageRequest.Builder(context)
+          .data(modelData)
+          .crossfade(true)
+          .build()
+      }
       AsyncImage(
-        model = imageUri,
+        model = imageRequest,
         contentDescription = "تصویر کارت",
         modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
+        onError = { isError = true }
       )
     } else {
       val icon = when {
